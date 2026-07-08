@@ -1,0 +1,5 @@
+# MySQL Database Configurations
+MYSQL_ROOT_PASSWORD=sua_senha_aqui
+MYSQL_DATABASE=gestao_ativos
+MYSQL_PORT=3306
+MYSQL_HOST=localhost
