@@ -1,4 +1,4 @@
-CREATE TABLE equipamento (
+CREATE TABLE equipamentos (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     numero_patrimonio VARCHAR(50) NOT NULL UNIQUE,
     categoria VARCHAR(50) NOT NULL,

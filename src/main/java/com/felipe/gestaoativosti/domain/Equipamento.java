@@ -1,8 +1,15 @@
 package com.felipe.gestaoativosti.domain;
 
 import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
+@Table(name = "equipamentos")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = "id")
 public class Equipamento {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
