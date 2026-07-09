@@ -31,16 +31,20 @@ public class EquipamentoService {
                 .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado com o ID: " + id));
     }
 
-    @Transactional
     public Equipamento salvar(Equipamento equipamento) {
+        assertNumeroPatrimonioDoesNotExists(equipamento.getNumeroPatrimonio());
         return repository.save(equipamento);
     }
 
     @Transactional
     public Equipamento atualizar(Long id, Equipamento equipamentoAtualizado) {
-        buscarPorId(id);
-        Equipamento equipamentoParaSalvar = equipamentoAtualizado.toBuilder().id(id).build();
-        return repository.save(equipamentoParaSalvar);
+        Equipamento equipamentoExistente = buscarPorId(id);
+        assertNumeroPatrimonioDoesNotExistsParaAtualizacao(equipamentoAtualizado.getNumeroPatrimonio(), id);
+        equipamentoAtualizado.setId(id);
+        if (equipamentoAtualizado.getNumeroPatrimonio() == null) {
+            equipamentoAtualizado.setNumeroPatrimonio(equipamentoExistente.getNumeroPatrimonio());
+        }
+        return repository.save(equipamentoAtualizado);
     }
 
     @Transactional
@@ -49,5 +53,15 @@ public class EquipamentoService {
         repository.delete(equipamento);
     }
 
+    private void assertNumeroPatrimonioDoesNotExists(String numeroPatrimonio){
+        if (repository.existsByNumeroPatrimonio(numeroPatrimonio)){
+            throw new IllegalArgumentException("Número de patrimônio já está sendo utilizado.");
+        }
+    }
 
+    private void assertNumeroPatrimonioDoesNotExistsParaAtualizacao(String numeroPatrimonio, Long id){
+        if (repository.existsByNumeroPatrimonioAndIdNot(numeroPatrimonio, id)){
+            throw new IllegalArgumentException("Número de patrimônio já está sendo utilizado por outro equipamento.");
+        }
+    }
 }

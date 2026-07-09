@@ -10,4 +10,6 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface EquipamentoRepository extends JpaRepository<Equipamento, Long> {
     Page<Equipamento> findByStatus(Status status, Pageable pageable);
+    boolean existsByNumeroPatrimonio(String numeroPatrimonio);
+    boolean existsByNumeroPatrimonioAndIdNot(String numeroPatrimonio, Long id);
 }
