@@ -10,16 +10,19 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class EquipamentoService {
     private final EquipamentoRepository repository;
 
     @Transactional(readOnly = true)
-    public List<Equipamento> listarTodos() {
-        return repository.findAll();
+    public Page<Equipamento> listarDisponiveis(Pageable pageable){
+        return repository.findByStatus(Status.DISPONIVEL, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<Equipamento> listarTodos(Pageable pageable) {
+        return repository.findAll(pageable);
     }
 
     @Transactional(readOnly = true)
@@ -44,10 +47,6 @@ public class EquipamentoService {
     public void deletar(Long id) {
         Equipamento equipamento = buscarPorId(id);
         repository.delete(equipamento);
-    }
-
-    public Page<Equipamento> listAvailableEquipamentos(Pageable pageable){
-        return repository.findByStatus(Status.DISPONIVEL, pageable);
     }
 
 
