@@ -7,6 +7,7 @@ import lombok.*;
 @Table(name = "equipamentos")
 @Getter
 @Setter
+@Builder(toBuilder = true)
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
