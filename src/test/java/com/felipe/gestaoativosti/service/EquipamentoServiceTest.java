@@ -56,7 +56,7 @@ class EquipamentoServiceTest {
 
         assertNotNull(result);
         assertEquals(1, result.getTotalElements());
-        assertEquals(equipamento, result.getContent().get(0));
+        assertEquals(equipamento, result.getContent().getFirst());
         verify(repository, times(1)).findByStatus(Status.DISPONIVEL, pageable);
     }
 
@@ -165,5 +165,15 @@ class EquipamentoServiceTest {
 
         assertDoesNotThrow(() -> service.deletar(1L));
         verify(repository, times(1)).delete(equipamento);
+    }
+
+    @Test
+    @DisplayName("Should throw EntityNotFoundException when deleting non-existent equipment")
+    void testDeletarNotFound() {
+        when(repository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThrows(EntityNotFoundException.class, () -> service.deletar(1L));
+        verify(repository, times(1)).findById(1L);
+        verify(repository, never()).delete(any(Equipamento.class));
     }
 }
