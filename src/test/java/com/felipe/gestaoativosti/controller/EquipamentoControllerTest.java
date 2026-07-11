@@ -9,7 +9,8 @@ import com.felipe.gestaoativosti.response.EquipamentoGetResponse;
 import com.felipe.gestaoativosti.response.EquipamentoPostResponse;
 import com.felipe.gestaoativosti.response.EquipamentoPutResponse;
 import com.felipe.gestaoativosti.service.EquipamentoService;
-import jakarta.persistence.EntityNotFoundException;
+import com.felipe.gestaoativosti.exception.NotFoundException;
+import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -178,12 +179,12 @@ class EquipamentoControllerTest {
     @Test
     @DisplayName("GET /api/v1/equipamentos/{id} should return 404 when equipment not found")
     void testBuscarPorIdNotFound() throws Exception {
-        when(service.buscarPorId(99L)).thenThrow(new EntityNotFoundException("Equipamento não encontrado"));
+        when(service.buscarPorId(99L)).thenThrow(new NotFoundException("Equipamento não encontrado"));
 
         mockMvc.perform(get("/api/v1/equipamentos/{id}", 99L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("Equipamento não encontrado"));
+                .andExpect(jsonPath("$.message").value("Equipamento não encontrado"));
     }
 
     @Test
@@ -216,13 +217,13 @@ class EquipamentoControllerTest {
                 .build();
 
         when(mapper.toEquipamento(any(EquipamentoPostRequest.class))).thenReturn(equipamento);
-        when(service.salvar(any(Equipamento.class))).thenThrow(new IllegalArgumentException("Número de patrimônio já está sendo utilizado."));
+        when(service.salvar(any(Equipamento.class))).thenThrow(new PatrimonioAlreadyExistsException("Número de patrimônio já está sendo utilizado."));
 
         mockMvc.perform(post("/api/v1/equipamentos")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(postRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Número de patrimônio já está sendo utilizado."));
+                .andExpect(jsonPath("$.message").value("Número de patrimônio já está sendo utilizado."));
     }
 
     @Test
@@ -235,13 +236,13 @@ class EquipamentoControllerTest {
                 .build();
 
         when(mapper.toEquipamento(any(EquipamentoPutRequest.class))).thenReturn(equipamento);
-        when(service.atualizar(eq(99L), any(Equipamento.class))).thenThrow(new EntityNotFoundException("Equipamento não encontrado"));
+        when(service.atualizar(eq(99L), any(Equipamento.class))).thenThrow(new NotFoundException("Equipamento não encontrado"));
 
         mockMvc.perform(put("/api/v1/equipamentos/{id}", 99L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(putRequest)))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("Equipamento não encontrado"));
+                .andExpect(jsonPath("$.message").value("Equipamento não encontrado"));
     }
 
     @Test
@@ -254,23 +255,23 @@ class EquipamentoControllerTest {
                 .build();
 
         when(mapper.toEquipamento(any(EquipamentoPutRequest.class))).thenReturn(equipamento);
-        when(service.atualizar(eq(1L), any(Equipamento.class))).thenThrow(new IllegalArgumentException("Número de patrimônio já está sendo utilizado por outro equipamento."));
+        when(service.atualizar(eq(1L), any(Equipamento.class))).thenThrow(new PatrimonioAlreadyExistsException("Número de patrimônio já está sendo utilizado por outro equipamento."));
 
         mockMvc.perform(put("/api/v1/equipamentos/{id}", 1L)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(putRequest)))
                 .andExpect(status().isBadRequest())
-                .andExpect(jsonPath("$.error").value("Número de patrimônio já está sendo utilizado por outro equipamento."));
+                .andExpect(jsonPath("$.message").value("Número de patrimônio já está sendo utilizado por outro equipamento."));
     }
 
     @Test
     @DisplayName("DELETE /api/v1/equipamentos/{id} should return 404 when deleting non-existent equipment")
     void testDeletarNotFound() throws Exception {
-        doThrow(new EntityNotFoundException("Equipamento não encontrado")).when(service).deletar(99L);
+        doThrow(new NotFoundException("Equipamento não encontrado")).when(service).deletar(99L);
 
         mockMvc.perform(delete("/api/v1/equipamentos/{id}", 99L)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.error").value("Equipamento não encontrado"));
+                .andExpect(jsonPath("$.message").value("Equipamento não encontrado"));
     }
 }

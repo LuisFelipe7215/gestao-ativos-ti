@@ -2,8 +2,9 @@ package com.felipe.gestaoativosti.service;
 
 import com.felipe.gestaoativosti.domain.Equipamento;
 import com.felipe.gestaoativosti.domain.Status;
+import com.felipe.gestaoativosti.exception.NotFoundException;
+import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
 import com.felipe.gestaoativosti.repository.EquipamentoRepository;
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,7 +29,7 @@ public class EquipamentoService {
     @Transactional(readOnly = true)
     public Equipamento buscarPorId(Long id) {
         return repository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Equipamento não encontrado com o ID: " + id));
+                .orElseThrow(() -> new NotFoundException("Equipamento não encontrado com o ID: " + id));
     }
 
     public Equipamento salvar(Equipamento equipamento) {
@@ -55,13 +56,13 @@ public class EquipamentoService {
 
     private void assertNumeroPatrimonioDoesNotExists(String numeroPatrimonio){
         if (repository.existsByNumeroPatrimonio(numeroPatrimonio)){
-            throw new IllegalArgumentException("Número de patrimônio já está sendo utilizado.");
+            throw new PatrimonioAlreadyExistsException("Número de patrimônio já está sendo utilizado.");
         }
     }
 
     private void assertNumeroPatrimonioDoesNotExistsParaAtualizacao(String numeroPatrimonio, Long id){
         if (repository.existsByNumeroPatrimonioAndIdNot(numeroPatrimonio, id)){
-            throw new IllegalArgumentException("Número de patrimônio já está sendo utilizado por outro equipamento.");
+            throw new PatrimonioAlreadyExistsException("Número de patrimônio já está sendo utilizado por outro equipamento.");
         }
     }
 }

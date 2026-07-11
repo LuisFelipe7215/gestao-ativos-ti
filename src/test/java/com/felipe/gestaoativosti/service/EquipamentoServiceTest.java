@@ -3,7 +3,8 @@ package com.felipe.gestaoativosti.service;
 import com.felipe.gestaoativosti.domain.Equipamento;
 import com.felipe.gestaoativosti.domain.Status;
 import com.felipe.gestaoativosti.repository.EquipamentoRepository;
-import jakarta.persistence.EntityNotFoundException;
+import com.felipe.gestaoativosti.exception.NotFoundException;
+import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -91,7 +92,7 @@ class EquipamentoServiceTest {
     void testBuscarPorIdNotFound() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> service.buscarPorId(1L));
+        assertThrows(NotFoundException.class, () -> service.buscarPorId(1L));
         verify(repository, times(1)).findById(1L);
     }
 
@@ -114,7 +115,7 @@ class EquipamentoServiceTest {
     void testSalvarDuplicatePatrimonio() {
         when(repository.existsByNumeroPatrimonio("PAT-001")).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> service.salvar(equipamento));
+        assertThrows(PatrimonioAlreadyExistsException.class, () -> service.salvar(equipamento));
         verify(repository, times(1)).existsByNumeroPatrimonio("PAT-001");
         verify(repository, never()).save(any(Equipamento.class));
     }
@@ -153,7 +154,7 @@ class EquipamentoServiceTest {
         when(repository.findById(1L)).thenReturn(Optional.of(equipamento));
         when(repository.existsByNumeroPatrimonioAndIdNot("PAT-002", 1L)).thenReturn(true);
 
-        assertThrows(IllegalArgumentException.class, () -> service.atualizar(1L, updatedData));
+        assertThrows(PatrimonioAlreadyExistsException.class, () -> service.atualizar(1L, updatedData));
         verify(repository, never()).save(any(Equipamento.class));
     }
 
@@ -172,7 +173,7 @@ class EquipamentoServiceTest {
     void testDeletarNotFound() {
         when(repository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(EntityNotFoundException.class, () -> service.deletar(1L));
+        assertThrows(NotFoundException.class, () -> service.deletar(1L));
         verify(repository, times(1)).findById(1L);
         verify(repository, never()).delete(any(Equipamento.class));
     }
