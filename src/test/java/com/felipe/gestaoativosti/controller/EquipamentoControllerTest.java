@@ -11,12 +11,14 @@ import com.felipe.gestaoativosti.response.EquipamentoPutResponse;
 import com.felipe.gestaoativosti.service.EquipamentoService;
 import com.felipe.gestaoativosti.exception.NotFoundException;
 import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
+import com.felipe.gestaoativosti.utils.EquipamentoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -36,6 +38,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = EquipamentoController.class)
+@Import(EquipamentoUtils.class)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc(addFilters = false)
 class EquipamentoControllerTest {
@@ -52,25 +55,17 @@ class EquipamentoControllerTest {
     @MockitoBean
     private EquipamentoMapper mapper;
 
+    @Autowired
+    private EquipamentoUtils equipamentoUtils;
+
     private Equipamento equipamento;
     private EquipamentoGetResponse responseDto;
 
     @BeforeEach
     void setUp() {
-        equipamento = Equipamento.builder()
-                .id(1L)
-                .numeroPatrimonio("PAT-001")
-                .categoria("Notebook")
-                .marcaModelo("Dell Latitude")
-                .status(Status.DISPONIVEL)
-                .build();
+        equipamento = equipamentoUtils.getEquipamento();
 
-        responseDto = EquipamentoGetResponse.builder()
-                .numeroPatrimonio("PAT-001")
-                .categoria("Notebook")
-                .marcaModelo("Dell Latitude")
-                .status(Status.DISPONIVEL)
-                .build();
+        responseDto = equipamentoUtils.getResponseDto();
     }
 
     @Test
@@ -116,16 +111,9 @@ class EquipamentoControllerTest {
     @Test
     @DisplayName("POST /api/v1/equipamentos should save and return post response")
     void testSalvar() throws Exception {
-        EquipamentoPostRequest postRequest = EquipamentoPostRequest.builder()
-                .numeroPatrimonio("PAT-001")
-                .categoria("Notebook")
-                .marcaModelo("Dell Latitude")
-                .status(Status.DISPONIVEL)
-                .build();
+        EquipamentoPostRequest postRequest = equipamentoUtils.getPostRequestDto();
 
-        EquipamentoPostResponse postResponse = EquipamentoPostResponse.builder()
-                .id(1L)
-                .build();
+        EquipamentoPostResponse postResponse = equipamentoUtils.getPostResponseDto();
 
         when(mapper.toEquipamento(any(EquipamentoPostRequest.class))).thenReturn(equipamento);
         when(service.salvar(any(Equipamento.class))).thenReturn(equipamento);
@@ -141,17 +129,9 @@ class EquipamentoControllerTest {
     @Test
     @DisplayName("PUT /api/v1/equipamentos/{id} should update and return put response")
     void testAtualizar() throws Exception {
-        EquipamentoPutRequest putRequest = EquipamentoPutRequest.builder()
-                .categoria("Desktop")
-                .marcaModelo("HP ProDesk")
-                .status(Status.MANUTENCAO)
-                .build();
+        EquipamentoPutRequest putRequest = equipamentoUtils.getPutRequestDto();
 
-        EquipamentoPutResponse putResponse = EquipamentoPutResponse.builder()
-                .categoria("Desktop")
-                .marcaModelo("HP ProDesk")
-                .status(Status.MANUTENCAO)
-                .build();
+        EquipamentoPutResponse putResponse = equipamentoUtils.getPutResponseDto();
 
         when(mapper.toEquipamento(any(EquipamentoPutRequest.class))).thenReturn(equipamento);
         when(service.atualizar(eq(1L), any(Equipamento.class))).thenReturn(equipamento);
@@ -209,12 +189,7 @@ class EquipamentoControllerTest {
     @Test
     @DisplayName("POST /api/v1/equipamentos should return 400 when saving duplicate patrimonio")
     void testSalvarDuplicatePatrimonio() throws Exception {
-        EquipamentoPostRequest postRequest = EquipamentoPostRequest.builder()
-                .numeroPatrimonio("PAT-001")
-                .categoria("Notebook")
-                .marcaModelo("Dell Latitude")
-                .status(Status.DISPONIVEL)
-                .build();
+        EquipamentoPostRequest postRequest = equipamentoUtils.getPostRequestDto();
 
         when(mapper.toEquipamento(any(EquipamentoPostRequest.class))).thenReturn(equipamento);
         when(service.salvar(any(Equipamento.class))).thenThrow(new PatrimonioAlreadyExistsException("Número de patrimônio já está sendo utilizado."));
@@ -229,11 +204,7 @@ class EquipamentoControllerTest {
     @Test
     @DisplayName("PUT /api/v1/equipamentos/{id} should return 404 when updating non-existent equipment")
     void testAtualizarNotFound() throws Exception {
-        EquipamentoPutRequest putRequest = EquipamentoPutRequest.builder()
-                .categoria("Desktop")
-                .marcaModelo("HP ProDesk")
-                .status(Status.MANUTENCAO)
-                .build();
+        EquipamentoPutRequest putRequest = equipamentoUtils.getPutRequestDto();
 
         when(mapper.toEquipamento(any(EquipamentoPutRequest.class))).thenReturn(equipamento);
         when(service.atualizar(eq(99L), any(Equipamento.class))).thenThrow(new NotFoundException("Equipamento não encontrado"));
@@ -248,11 +219,7 @@ class EquipamentoControllerTest {
     @Test
     @DisplayName("PUT /api/v1/equipamentos/{id} should return 400 when updating with duplicate patrimonio")
     void testAtualizarDuplicatePatrimonio() throws Exception {
-        EquipamentoPutRequest putRequest = EquipamentoPutRequest.builder()
-                .categoria("Desktop")
-                .marcaModelo("HP ProDesk")
-                .status(Status.MANUTENCAO)
-                .build();
+        EquipamentoPutRequest putRequest = equipamentoUtils.getPutRequestDto();
 
         when(mapper.toEquipamento(any(EquipamentoPutRequest.class))).thenReturn(equipamento);
         when(service.atualizar(eq(1L), any(Equipamento.class))).thenThrow(new PatrimonioAlreadyExistsException("Número de patrimônio já está sendo utilizado por outro equipamento."));

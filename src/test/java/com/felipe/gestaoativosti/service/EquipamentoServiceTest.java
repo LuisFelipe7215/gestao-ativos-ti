@@ -5,6 +5,7 @@ import com.felipe.gestaoativosti.domain.Status;
 import com.felipe.gestaoativosti.repository.EquipamentoRepository;
 import com.felipe.gestaoativosti.exception.NotFoundException;
 import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
+import com.felipe.gestaoativosti.utils.EquipamentoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,15 +36,12 @@ class EquipamentoServiceTest {
 
     private Equipamento equipamento;
 
+    @InjectMocks
+    private EquipamentoUtils equipamentoUtils;
+
     @BeforeEach
     void setUp() {
-        equipamento = Equipamento.builder()
-                .id(1L)
-                .numeroPatrimonio("PAT-001")
-                .categoria("Notebook")
-                .marcaModelo("Dell Latitude")
-                .status(Status.DISPONIVEL)
-                .build();
+        equipamento = equipamentoUtils.getEquipamento();
     }
 
     @Test
@@ -123,11 +121,7 @@ class EquipamentoServiceTest {
     @Test
     @DisplayName("Should update equipment successfully")
     void testAtualizarSuccess() {
-        Equipamento updatedData = Equipamento.builder()
-                .categoria("Desktop")
-                .marcaModelo("HP ProDesk")
-                .status(Status.MANUTENCAO)
-                .build();
+        Equipamento updatedData = equipamentoUtils.equipamentoToUpdate();
 
         when(repository.findById(1L)).thenReturn(Optional.of(equipamento));
         when(repository.existsByNumeroPatrimonioAndIdNot(any(), eq(1L))).thenReturn(false);
