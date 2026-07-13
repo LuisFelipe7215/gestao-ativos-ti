@@ -10,3 +10,7 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET}
