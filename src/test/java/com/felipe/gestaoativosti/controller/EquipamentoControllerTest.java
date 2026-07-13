@@ -11,6 +11,8 @@ import com.felipe.gestaoativosti.response.EquipamentoPutResponse;
 import com.felipe.gestaoativosti.service.EquipamentoService;
 import com.felipe.gestaoativosti.exception.NotFoundException;
 import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
+import com.felipe.gestaoativosti.security.TokenService;
+import com.felipe.gestaoativosti.service.UserService;
 import com.felipe.gestaoativosti.utils.EquipamentoUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -54,6 +56,12 @@ class EquipamentoControllerTest {
 
     @MockitoBean
     private EquipamentoMapper mapper;
+
+    @MockitoBean
+    private TokenService tokenService;
+
+    @MockitoBean
+    private UserService userService;
 
     @Autowired
     private EquipamentoUtils equipamentoUtils;
