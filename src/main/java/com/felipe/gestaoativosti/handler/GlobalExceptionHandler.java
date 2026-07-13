@@ -2,11 +2,14 @@ package com.felipe.gestaoativosti.handler;
 
 import com.felipe.gestaoativosti.exception.CustomNotFoundException;
 import com.felipe.gestaoativosti.exception.CustomPatrimonioAlreadyExistsException;
+import com.felipe.gestaoativosti.exception.CustomUsernameAlreadyExistsException;
 import com.felipe.gestaoativosti.exception.NotFoundException;
 import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
+import com.felipe.gestaoativosti.exception.UsernameAlreadyExistsException;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -39,6 +42,32 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 
+    @ExceptionHandler(UsernameAlreadyExistsException.class)
+    public ResponseEntity<CustomUsernameAlreadyExistsException> handleUsernameAlreadyExistsException(
+            UsernameAlreadyExistsException ex,
+            HttpServletRequest request) {
+
+        CustomUsernameAlreadyExistsException response = new CustomUsernameAlreadyExistsException(
+                HttpStatus.CONFLICT.value(),
+                ex.getMessage(), LocalDateTime.now(), request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, Object>> handleBadCredentialsException(
+            BadCredentialsException ex,
+            HttpServletRequest request) {
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", HttpStatus.UNAUTHORIZED.value());
+        response.put("message", "Credenciais inválidas");
+        response.put("timestamp", LocalDateTime.now());
+        response.put("path", request.getRequestURI());
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, Object> response = new HashMap<>();
@@ -50,3 +79,4 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }
+
