@@ -64,6 +64,9 @@ class EquipamentoControllerTest {
     @MockitoBean
     private UserService userService;
 
+    @MockitoBean
+    private com.felipe.gestaoativosti.repository.EquipamentoRepository equipamentoRepository;
+
     @Autowired
     private EquipamentoUtils equipamentoUtils;
 
