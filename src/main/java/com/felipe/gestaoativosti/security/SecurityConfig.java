@@ -19,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final SecurityFilter securityFilter;
+    private final static String[] OPENAPI_WHITE_LIST = {"/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -29,9 +30,9 @@ public class SecurityConfig {
                 .authorizeHttpRequests((auth) ->
                         auth.requestMatchers(HttpMethod.POST, "/api/v1/signup").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/equipamentos/disponiveis").permitAll()
+                                .requestMatchers(OPENAPI_WHITE_LIST).permitAll()
                                 .anyRequest().authenticated())
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class);
-
         return http.build();
     }
 
