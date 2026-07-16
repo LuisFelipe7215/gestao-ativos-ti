@@ -12,3 +12,7 @@ spring:
         dialect: org.hibernate.dialect.H2Dialect
   flyway:
     enabled: false
+api:
+  security:
+    token:
+      secret: "dc9df77132d9f07ae3dd818359f541f2225b5e742f06f1c7aa3b1cf54a6e24ab57b74a3f5c4f9534d1af2018dba9aa68aea20d0c8d83dfebd887fd775bd49eedi"
