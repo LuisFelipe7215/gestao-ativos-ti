@@ -26,14 +26,16 @@ public class SecurityFilter extends OncePerRequestFilter {
         String tokenJWT = recuperarToken(request);
 
         if (tokenJWT != null){
-            String subject = tokenService.getSubject(tokenJWT);
-
-            UserDetails usuario = userService.loadUserByUsername(subject);
-
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario,
-                    null, usuario.getAuthorities());
-
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            try {
+                String subject = tokenService.getSubject(tokenJWT);
+                UserDetails usuario = userService.loadUserByUsername(subject);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(usuario,
+                        null, usuario.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+            } catch (RuntimeException e) {
+                // Token inválido, expirado ou usuário inexistente: apenas ignora e não define a autenticação,
+                // permitindo que o Spring Security trate o acesso não autorizado.
+            }
         }
 
         filterChain.doFilter(request, response);
