@@ -6,6 +6,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,6 +17,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class SecurityFilter extends OncePerRequestFilter {
     private final TokenService tokenService;
     private final UserService userService;
@@ -33,8 +35,7 @@ public class SecurityFilter extends OncePerRequestFilter {
                         null, usuario.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (RuntimeException e) {
-                // Token inválido, expirado ou usuário inexistente: apenas ignora e não define a autenticação,
-                // permitindo que o Spring Security trate o acesso não autorizado.
+                log.warn("Erro ao decodificar ou validar o token JWT: {}", e.getMessage());
             }
         }
 
