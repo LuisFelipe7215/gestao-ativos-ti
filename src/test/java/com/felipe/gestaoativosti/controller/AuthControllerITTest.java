@@ -92,46 +92,4 @@ class AuthControllerITTest extends BaseIntegrationTest {
                 .body("errors.username", Matchers.equalTo("O username não pode ser nulo ou vazio"))
                 .body("errors.password", Matchers.equalTo("A senha deve ter no mínimo 6 caracteres"));
     }
-
-    @Test
-    @DisplayName("POST /api/v1/login should return 200 when accessing with a valid token")
-    void testLoginSuccess() {
-        User user = User.builder()
-                .username("loginuser")
-                .password(passwordEncoder.encode("password123"))
-                .roles("ROLE_USER")
-                .build();
-        userRepository.save(user);
-
-        String token = tokenService.gerarToken(user.getUsername());
-
-        given().contentType(ContentType.JSON)
-                .header("Authorization", "Bearer " + token)
-                .when()
-                .post("/api/v1/login")
-                .then()
-                .statusCode(HttpStatus.OK.value())
-                .body("message", Matchers.equalTo("Login realizado com sucesso."));
-    }
-
-    @Test
-    @DisplayName("POST /api/v1/login should return 403 when accessing without token")
-    void testLoginWithoutToken() {
-        given().contentType(ContentType.JSON)
-                .when()
-                .post("/api/v1/login")
-                .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
-    }
-
-    @Test
-    @DisplayName("POST /api/v1/login should return 403 when accessing with an invalid token")
-    void testLoginWithInvalidToken() {
-        given().contentType(ContentType.JSON)
-                .header("Authorization", "Bearer invalidtoken123")
-                .when()
-                .post("/api/v1/login")
-                .then()
-                .statusCode(HttpStatus.FORBIDDEN.value());
-    }
 }

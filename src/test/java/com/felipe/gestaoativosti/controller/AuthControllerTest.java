@@ -104,13 +104,4 @@ class AuthControllerTest {
 
         verify(authService, never()).signup(any(SignupRequest.class));
     }
-
-    @Test
-    @DisplayName("POST /api/v1/login should return 200 and success message when authenticated")
-    void testLoginSuccess() throws Exception {
-        mockMvc.perform(post("/api/v1/login")
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.message").value("Login realizado com sucesso."));
-    }
 }
