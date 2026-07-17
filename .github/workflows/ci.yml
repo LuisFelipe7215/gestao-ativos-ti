@@ -21,8 +21,5 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Download Maven dependencies (Cache Warmup)
-        run: mvn dependency:go-offline
-
       - name: Runs Tests with Maven
         run: mvn clean test
