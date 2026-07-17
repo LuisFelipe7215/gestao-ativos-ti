@@ -1,9 +1,12 @@
 package com.felipe.gestaoativosti.controller;
 
+import com.felipe.gestaoativosti.exception.CustomUsernameAlreadyExistsException;
 import com.felipe.gestaoativosti.request.SignupRequest;
 import com.felipe.gestaoativosti.response.TokenResponse;
 import com.felipe.gestaoativosti.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +33,8 @@ public class AuthController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "Usuário criado com sucesso"),
-            @ApiResponse(responseCode = "409", description = "Username já está em uso por outro usuário"),
+            @ApiResponse(responseCode = "409", description = "Username já está em uso por outro usuário",
+                    content = @Content(schema = @Schema(implementation = CustomUsernameAlreadyExistsException.class))),
             @ApiResponse(responseCode = "401", description = "Campos obrigatórios nulos ou em branco")
     })
     public ResponseEntity<TokenResponse> signup(@RequestBody @Valid SignupRequest request) {
