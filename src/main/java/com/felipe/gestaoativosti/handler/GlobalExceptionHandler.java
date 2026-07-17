@@ -3,6 +3,8 @@ package com.felipe.gestaoativosti.handler;
 import com.felipe.gestaoativosti.exception.CustomNotFoundException;
 import com.felipe.gestaoativosti.exception.CustomPatrimonioAlreadyExistsException;
 import com.felipe.gestaoativosti.exception.CustomUsernameAlreadyExistsException;
+import com.felipe.gestaoativosti.exception.CustomUnauthorizedResponse;
+import com.felipe.gestaoativosti.exception.CustomValidationErrorResponse;
 import com.felipe.gestaoativosti.exception.NotFoundException;
 import com.felipe.gestaoativosti.exception.PatrimonioAlreadyExistsException;
 import com.felipe.gestaoativosti.exception.UsernameAlreadyExistsException;
@@ -55,27 +57,27 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(BadCredentialsException.class)
-    public ResponseEntity<Map<String, Object>> handleBadCredentialsException(
+    public ResponseEntity<CustomUnauthorizedResponse> handleBadCredentialsException(
             BadCredentialsException ex,
             HttpServletRequest request) {
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.UNAUTHORIZED.value());
-        response.put("message", "Credenciais inválidas");
-        response.put("timestamp", LocalDateTime.now());
-        response.put("path", request.getRequestURI());
+        CustomUnauthorizedResponse response = new CustomUnauthorizedResponse(
+                HttpStatus.UNAUTHORIZED.value(),
+                "Credenciais inválidas",
+                LocalDateTime.now(),
+                request.getRequestURI()
+        );
 
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Map<String, Object>> handleValidationExceptions(MethodArgumentNotValidException ex) {
-        Map<String, Object> response = new HashMap<>();
+    public ResponseEntity<CustomValidationErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-        response.put("errors", errors);
+        CustomValidationErrorResponse response = new CustomValidationErrorResponse(errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
 }

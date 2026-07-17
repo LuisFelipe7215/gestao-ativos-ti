@@ -10,6 +10,8 @@ import com.felipe.gestaoativosti.response.EquipamentoPutResponse;
 import com.felipe.gestaoativosti.service.EquipamentoService;
 import com.felipe.gestaoativosti.exception.CustomNotFoundException;
 import com.felipe.gestaoativosti.exception.CustomPatrimonioAlreadyExistsException;
+import com.felipe.gestaoativosti.exception.CustomForbiddenResponse;
+import com.felipe.gestaoativosti.exception.CustomValidationErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -43,7 +45,8 @@ public class EquipamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista paginada retornada com sucesso."),
-            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado")
+            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado",
+                    content = @Content(schema = @Schema(implementation = CustomForbiddenResponse.class)))
     })
     public ResponseEntity<Page<EquipamentoGetResponse>> listarTodos(@ParameterObject @PageableDefault(sort = "id") Pageable pageable) {
         Page<Equipamento> equipamentos = service.listarTodos(pageable);
@@ -60,7 +63,8 @@ public class EquipamentoController {
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Lista paginada retornada com sucesso."),
-            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado")
+            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado",
+                    content = @Content(schema = @Schema(implementation = CustomForbiddenResponse.class)))
     })
     public ResponseEntity<Page<EquipamentoGetResponse>> listarDisponiveis(@ParameterObject @PageableDefault(sort = "id") Pageable pageable) {
         Page<Equipamento> equipamentos = service.listarDisponiveis(pageable);
@@ -75,7 +79,8 @@ public class EquipamentoController {
     )
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "Equipamento retornado com sucesso"),
-            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado"),
+            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado",
+                    content = @Content(schema = @Schema(implementation = CustomForbiddenResponse.class))),
             @ApiResponse(responseCode = "404", description = "Equipamento não encontrado com o id fornecido",
                     content = @Content(schema = @Schema(implementation = CustomNotFoundException.class)))
     })
@@ -94,8 +99,10 @@ public class EquipamentoController {
             @ApiResponse(responseCode = "201", description = "Equipamento cadastrado com sucesso."),
             @ApiResponse(responseCode = "400", description = "Número de patrimônio já está sendo utilizado por outro equipamento.",
                     content = @Content(schema = @Schema(implementation = CustomPatrimonioAlreadyExistsException.class))),
-            @ApiResponse(responseCode = "401", description = "Campos obrigatórios nulos ou em branco"),
-            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado")
+            @ApiResponse(responseCode = "401", description = "Campos obrigatórios nulos ou em branco",
+                    content = @Content(schema = @Schema(implementation = CustomValidationErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado",
+                    content = @Content(schema = @Schema(implementation = CustomForbiddenResponse.class)))
     })
     public ResponseEntity<EquipamentoPostResponse> salvar(@RequestBody @Valid EquipamentoPostRequest request) {
         Equipamento equipamentoToSave = mapper.toEquipamento(request);
@@ -113,8 +120,10 @@ public class EquipamentoController {
                     content = @Content(schema = @Schema(implementation = CustomNotFoundException.class))),
             @ApiResponse(responseCode = "400", description = "Número de patrimônio já está sendo utilizado por outro equipamento.",
                     content = @Content(schema = @Schema(implementation = CustomPatrimonioAlreadyExistsException.class))),
-            @ApiResponse(responseCode = "401", description = "Campos obrigatórios nulos ou em branco"),
-            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado")
+            @ApiResponse(responseCode = "401", description = "Campos obrigatórios nulos ou em branco",
+                    content = @Content(schema = @Schema(implementation = CustomValidationErrorResponse.class))),
+            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado",
+                    content = @Content(schema = @Schema(implementation = CustomForbiddenResponse.class)))
     })
     @PutMapping("/{id}")
     public ResponseEntity<EquipamentoPutResponse> atualizar(@PathVariable Long id, @RequestBody @Valid EquipamentoPutRequest request) {
@@ -131,7 +140,8 @@ public class EquipamentoController {
             @ApiResponse(responseCode = "204", description = "Equipamento removido com sucesso"),
             @ApiResponse(responseCode = "404", description = "Equipamento não encontrado com o id fornecido",
                     content = @Content(schema = @Schema(implementation = CustomNotFoundException.class))),
-            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado")
+            @ApiResponse(responseCode = "403", description = "Token JWT ausente, inválido ou expirado",
+                    content = @Content(schema = @Schema(implementation = CustomForbiddenResponse.class)))
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {
