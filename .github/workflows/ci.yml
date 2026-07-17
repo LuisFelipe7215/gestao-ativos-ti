@@ -20,6 +20,6 @@ jobs:
           java-version: '25'
           distribution: 'temurin'
           cache: 'maven'
-
+          cache-dependency-path: 'gestao-ativos-ti/pom.xml'
       - name: Runs Tests with Maven
         run: mvn clean test
